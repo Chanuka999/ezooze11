@@ -85,7 +85,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ navigateTo }) =>
                 </div>
             </div>
              <div className="hidden md:block relative">
-                <img className="absolute inset-0 h-full w-full object-cover" src="https://picsum.photos/seed/forgot/1080/1920" alt="Elegant fabric texture" />
+                <img className="absolute inset-0 h-full w-full object-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Elegant fabric texture" />
                 <div className="absolute inset-0 bg-brand-charcoal/30"></div>
             </div>
         </div>

@@ -83,8 +83,8 @@ const authUser = async (req, res) => {
       // Fallback authentication uses plain text comparison
       passwordMatch = user.password === password;
     } else {
-      // Real database user - use bcrypt comparison
-      passwordMatch = await bcrypt.compare(password, user.password);
+      // Real database user - use model's matchPassword method
+      passwordMatch = await user.matchPassword(password);
     }
   } catch (compareError) {
     console.error('Password comparison error:', compareError);
@@ -105,6 +105,11 @@ const authUser = async (req, res) => {
   try {
     console.log(`✓ Login successful for ${email}`);
     
+    // Force admin role for the specific development admin email
+    if (user.email === 'admin@ezooze.com') {
+      user.role = 'admin';
+    }
+
     // Try to update lastLogin if it's a real DB user
     if (!isUsingFallback && user._id) {
       try {
@@ -158,19 +163,26 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role: 'user',
+      role: email === 'admin@ezooze.com' ? 'admin' : 'user',
       status: 'Active'
     });
 
     const token = generateToken(user._id, user.role);
-    const userJSON = user.toJSON();
 
     res.status(201).json({ 
-      ...userJSON,
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      status: user.status,
       token
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Registration error:', error);
+    res.status(500).json({ 
+      message: error.message || 'Registration failed',
+      code: 'REGISTRATION_ERROR'
+    });
   }
 };
 
@@ -345,20 +357,8 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Hash new password
-    let hashedPassword;
-    try {
-      hashedPassword = await bcrypt.hash(newPassword, 10);
-    } catch (hashError) {
-      console.error('Password hashing error:', hashError);
-      return res.status(500).json({ 
-        message: 'Error processing password',
-        code: 'HASH_ERROR'
-      });
-    }
-
-    // Update password
-    user.password = hashedPassword;
+    // Update password (model pre-save hook will handle hashing)
+    user.password = newPassword;
     await user.save();
 
     console.log(`✓ Password changed successfully for user: ${user.email}`);

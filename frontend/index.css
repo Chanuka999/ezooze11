@@ -1,0 +1,86 @@
+/* Luxury Minimalist Design System */
+:root {
+    --brand-gold: #B48A2D;
+    --brand-gold-glow: rgba(180, 138, 45, 0.4);
+    --brand-charcoal: #0F1216;
+    --brand-surface: #1A1E24;
+    --glass-bg: rgba(26, 30, 36, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+    background-color: var(--brand-charcoal);
+    color: #F9FAFB;
+    font-family: 'Outfit', 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-serif {
+    font-family: 'Cormorant Garamond', serif;
+}
+
+/* Glassmorphism Utilities */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Premium Gradients */
+.bg-gradient-gold {
+    background: linear-gradient(135deg, #B48A2D 0%, #D4AF37 50%, #B48A2D 100%);
+}
+
+.text-gradient-gold {
+    background: linear-gradient(to right, #B48A2D, #D4AF37);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Glow Effects */
+.glow-gold {
+    box-shadow: 0 0 20px var(--brand-gold-glow);
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 30px var(--brand-gold-glow);
+    transform: translateY(-2px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--brand-charcoal);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-gold);
+}
+
+/* Animation Delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+/* Transitions */
+.transition-luxury {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}

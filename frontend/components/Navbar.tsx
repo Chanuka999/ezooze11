@@ -69,6 +69,10 @@ export const Navbar: React.FC<NavbarProps> = ({ navigateTo, navLinks, currentPag
     navigateTo('home');
   }
 
+  const handleDashboard = () => {
+    navigateTo('dashboard' as any);
+  }
+
   const activeMenuData = navLinks.find(link => link.name === activeMegaMenu);
 
   const navClass = `fixed top-0 w-full z-40 transition-all duration-300 ease-out ${
@@ -183,15 +187,22 @@ export const Navbar: React.FC<NavbarProps> = ({ navigateTo, navLinks, currentPag
                                       <p className="font-bold text-brand-charcoal dark:text-brand-cream">{user?.name}</p>
                                       <p className="truncate text-xs text-gray-500 dark:text-gray-400 mt-1">{user?.email}</p>
                                   </div>
-                                  {user?.role === 'admin' && (
-                                    <button
-                                        onClick={() => navigateTo('admin')}
-                                        className="block w-full text-left px-4 py-3 text-sm text-brand-charcoal dark:text-brand-cream hover:bg-brand-gold/10 dark:hover:bg-brand-gold/10 hover:text-brand-gold transition-all duration-300 hover:translate-x-1 transform"
-                                        role="menuitem"
-                                    >
-                                        Admin Panel
-                                    </button>
-                                  )}
+                                   <button
+                                       onClick={handleDashboard}
+                                       className="block w-full text-left px-4 py-3 text-sm text-brand-charcoal dark:text-brand-cream hover:bg-brand-gold/10 dark:hover:bg-brand-gold/10 hover:text-brand-gold transition-all duration-300 hover:translate-x-1 transform"
+                                       role="menuitem"
+                                   >
+                                       My Dashboard
+                                   </button>
+                                   {user?.role === 'admin' && (
+                                     <button
+                                         onClick={() => navigateTo('admin')}
+                                         className="block w-full text-left px-4 py-3 text-sm text-brand-charcoal dark:text-brand-cream hover:bg-brand-gold/10 dark:hover:bg-brand-gold/10 hover:text-brand-gold transition-all duration-300 hover:translate-x-1 transform"
+                                         role="menuitem"
+                                     >
+                                         Admin Panel
+                                     </button>
+                                   )}
                                   <button
                                       onClick={handleLogout}
                                       className="block w-full text-left px-4 py-3 text-sm text-brand-charcoal dark:text-brand-cream hover:bg-brand-gold/10 dark:hover:bg-brand-gold/10 hover:text-brand-gold transition-all duration-300 hover:translate-x-1 transform"
@@ -203,6 +214,14 @@ export const Navbar: React.FC<NavbarProps> = ({ navigateTo, navLinks, currentPag
                           </div>
                       )}
                   </div>
+                  {!isAuthenticated && (
+                      <button 
+                        onClick={() => navigateTo('register')} 
+                        className="hidden xl:block px-4 py-2 text-xs font-bold tracking-widest uppercase border border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-white transition-all duration-300 rounded-md whitespace-nowrap"
+                      >
+                        Sign Up
+                      </button>
+                  )}
                   <button
                       onClick={() => navigateTo('cart')}
                       aria-label={`View shopping cart, ${cartItemCount} items`}
@@ -327,16 +346,22 @@ export const Navbar: React.FC<NavbarProps> = ({ navigateTo, navLinks, currentPag
                                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
                                   </div>
                               </div>
+                               <button onClick={() => { handleDashboard(); toggleMobileMenu(); }} className="block w-full text-left py-2 text-sm font-medium text-brand-gold hover:text-yellow-600 hover:translate-x-1 transition-all duration-300 transform">My Dashboard</button>
                               {user?.role === 'admin' && (
                                 <button onClick={() => { navigateTo('admin'); toggleMobileMenu(); }} className="block w-full text-left py-2 text-sm font-medium text-brand-gold hover:text-yellow-600 hover:translate-x-1 transition-all duration-300 transform">Admin Panel</button>
                               )}
                               <button onClick={() => { handleLogout(); toggleMobileMenu(); }} className="block w-full text-left py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-brand-charcoal dark:hover:text-white hover:translate-x-1 transition-all duration-300 transform">Sign Out</button>
                           </div>
                       ) : (
-                          <button onClick={() => { navigateTo('login'); toggleMobileMenu(); }} className="flex items-center px-4 py-3 font-bold text-white bg-brand-gold hover:bg-yellow-600 rounded-lg transition-all duration-300 hover:shadow-lg transform hover:scale-105">
-                              <UserIcon className="h-5 w-5 mr-2" />
-                              <span>Sign In</span>
-                          </button>
+                          <div className="flex flex-col gap-2 flex-1">
+                            <button onClick={() => { navigateTo('login'); toggleMobileMenu(); }} className="flex items-center px-4 py-3 font-bold text-white bg-brand-charcoal dark:bg-brand-cream dark:text-brand-charcoal hover:bg-gray-800 rounded-lg transition-all duration-300 hover:shadow-lg transform active:scale-95">
+                                <UserIcon className="h-5 w-5 mr-2" />
+                                <span>Sign In</span>
+                            </button>
+                            <button onClick={() => { navigateTo('register'); toggleMobileMenu(); }} className="flex items-center px-4 py-3 font-bold text-white bg-brand-gold hover:bg-yellow-600 rounded-lg transition-all duration-300 hover:shadow-lg transform active:scale-95">
+                                <span className="w-full text-center">Create Account</span>
+                            </button>
+                          </div>
                       )}
                       <button onClick={toggleTheme} aria-label="Toggle theme" className="p-3 rounded-full bg-white dark:bg-brand-charcoal shadow-sm hover:shadow-md transition-all duration-300 text-gray-500 dark:text-gray-400 hover:text-brand-gold dark:hover:text-brand-gold hover:scale-110 transform">
                           {theme === 'light' ? <MoonIcon className="h-5 w-5" /> : <SunIcon className="h-5 w-5" />}

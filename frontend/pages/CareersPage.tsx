@@ -26,7 +26,7 @@ export const CareersPage: React.FC<CareersPageProps> = ({ content }) => {
             {/* Hero Section */}
              <div className="relative bg-brand-charcoal py-24 sm:py-32">
                  <img
-                    src="https://picsum.photos/seed/careers/1800/1000"
+                    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
                     alt="ezooze office"
                     className="absolute inset-0 h-full w-full object-cover mix-blend-multiply"
                 />

@@ -18,7 +18,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ content }) => {
             {/* Hero Section */}
             <div className="relative bg-brand-charcoal py-24 sm:py-32">
                  <img
-                    src="https://picsum.photos/seed/about/1800/1000"
+                    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
                     alt="Our Team"
                     className="absolute inset-0 h-full w-full object-cover mix-blend-multiply"
                 />
@@ -40,7 +40,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ content }) => {
 
             {/* Image Section */}
             <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-                <img src="https://picsum.photos/seed/atelier/1600/900" alt="ezooze atelier" className="rounded-lg shadow-xl" />
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="ezooze atelier" className="rounded-lg shadow-xl" />
             </div>
 
             {/* Our Values Section */}

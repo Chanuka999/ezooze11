@@ -16,17 +16,22 @@ interface AdminOrdersProps {
 const ORDERS_PER_PAGE = 10;
 
 const StatusBadge: React.FC<{ status: Order['status'] }> = ({ status }) => {
-    const colorClasses: Record<OrderStatus, string> = {
-        'Confirmed': 'bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-        'Processing': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-        'Packing': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-        'Shipped': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-        'Out for Delivery': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-        'Delivered': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-        'Cancelled': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-        'Refunded': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+    const colorConfigs: Record<OrderStatus, { text: string, bg: string, border: string }> = {
+        'Confirmed': { text: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' },
+        'Processing': { text: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'border-indigo-400/20' },
+        'Packing': { text: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/20' },
+        'Shipped': { text: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/20' },
+        'Out for Delivery': { text: 'text-orange-400', bg: 'bg-orange-400/10', border: 'border-orange-400/20' },
+        'Delivered': { text: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
+        'Cancelled': { text: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/20' },
+        'Refunded': { text: 'text-zinc-400', bg: 'bg-zinc-400/10', border: 'border-zinc-400/20' },
     };
-    return <span className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${colorClasses[status] || colorClasses['Confirmed']}`}>{status}</span>;
+    const config = colorConfigs[status] || colorConfigs['Confirmed'];
+    return (
+        <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border shadow-sm ${config.text} ${config.bg} ${config.border}`}>
+            {status}
+        </span>
+    );
 };
 
 const OrderCard: React.FC<{ order: Order, onDragStart: (e: React.DragEvent<HTMLDivElement>, order: Order) => void, onClick: () => void }> = ({ order, onDragStart, onClick }) => (
@@ -34,15 +39,19 @@ const OrderCard: React.FC<{ order: Order, onDragStart: (e: React.DragEvent<HTMLD
         draggable
         onDragStart={(e) => onDragStart(e, order)}
         onClick={onClick}
-        className="bg-white dark:bg-brand-surface p-4 rounded-lg shadow border dark:border-brand-border cursor-grab active:cursor-grabbing mb-4 transition-shadow hover:shadow-md"
+        className="glass-card hover-glow p-5 rounded-2xl transition-luxury group cursor-grab active:cursor-grabbing mb-4 border border-white/5 relative overflow-hidden"
     >
-        <div className="flex justify-between items-start">
-            <p className="font-bold font-mono text-sm text-gray-900 dark:text-white">{order.id}</p>
+        <div className="absolute top-0 right-0 w-20 h-20 bg-brand-gold/5 rounded-full blur-2xl -z-10 transition-colors group-hover:bg-brand-gold/10"></div>
+        <div className="flex justify-between items-start mb-4">
+            <p className="font-black text-[11px] text-brand-gold tracking-widest uppercase">{order.id}</p>
             <StatusBadge status={order.status} />
         </div>
-        <p className="text-sm mt-2 font-medium text-gray-800 dark:text-gray-200">{order.customerName}</p>
-        <p className="text-xs text-gray-500">{new Date(order.date).toLocaleDateString()}</p>
-        <p className="text-right font-semibold mt-2 text-gray-900 dark:text-white">Rs. {order.total.toLocaleString()}</p>
+        <p className="text-sm font-bold text-white group-hover:text-brand-gold transition-luxury mb-1">{order.customerName}</p>
+        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{new Date(order.date).toLocaleDateString()}</p>
+        <div className="flex justify-between items-center mt-6 border-t border-white/5 pt-4">
+             <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Valuation</p>
+             <p className="text-base font-black text-white">Rs. {order.total.toLocaleString()}</p>
+        </div>
     </div>
 );
 
@@ -98,11 +107,11 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders, setOrders, add
     const totalPages = Math.ceil(filteredListOrders.length / ORDERS_PER_PAGE);
 
     // --- Board View Data & Logic ---
-    const boardColumns: { id: KanbanColumnId, title: string }[] = [
-        { id: 'New', title: 'New' },
-        { id: 'InProgress', title: 'In Progress' },
-        { id: 'OnTheWay', title: 'On The Way' },
-        { id: 'Done', title: 'Done' },
+    const boardColumns: { id: KanbanColumnId, title: string, subtitle: string }[] = [
+        { id: 'New', title: 'Pending Approval', subtitle: 'Recent Acquisitions' },
+        { id: 'InProgress', title: 'Operational', subtitle: 'Packing & Fulfillment' },
+        { id: 'OnTheWay', title: 'Transit Logistics', subtitle: 'Dispatch Flow' },
+        { id: 'Done', title: 'Completed', subtitle: 'Successful Deliveries' },
     ];
     
     const ordersByColumn = useMemo(() => {
@@ -134,7 +143,6 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders, setOrders, add
             return;
         }
 
-        // Determine the default "landing status" for each column
         let targetStatus: OrderStatus;
         switch (targetColumn) {
             case 'New': targetStatus = 'Confirmed'; break;
@@ -144,19 +152,17 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders, setOrders, add
             default: return;
         }
 
-        // If moving to OnTheWay, enforce manual input for tracking
         if (targetColumn === 'OnTheWay') {
             setOrderToView({ ...draggedOrder, status: 'Shipped' });
         } else {
-            // Simple move logic
              const updatedOrder: Order = {
                  ...draggedOrder,
                  status: targetStatus,
-                 statusHistory: [...(draggedOrder.statusHistory || []), { status: targetStatus, timestamp: new Date().toISOString(), note: 'Moved via Kanban Board' }]
+                 statusHistory: [...(draggedOrder.statusHistory || []), { status: targetStatus, timestamp: new Date().toISOString(), note: 'Moved via Command Center Board' }]
              };
 
             setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
-            addNotification(`Order #${updatedOrder.id} moved to ${targetStatus}.`, 'info');
+            addNotification(`Order #${updatedOrder.id} successfully transitioned to ${targetStatus}.`, 'info');
         }
         setDraggedOrder(null);
     };
@@ -164,115 +170,161 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders, setOrders, add
     const handleSaveOrder = (updatedOrder: Order) => {
         setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
         setOrderToView(null);
-        addNotification(`Order #${updatedOrder.id} has been updated to ${updatedOrder.status}.`, 'success');
+        addNotification(`Order #${updatedOrder.id} status updated to ${updatedOrder.status}.`, 'success');
     };
 
     const ViewSwitcher = () => (
-        <div className="flex items-center space-x-1 p-1 bg-gray-200 dark:bg-brand-surface rounded-lg">
-            <button onClick={() => setViewMode('board')} className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${viewMode === 'board' ? 'bg-white dark:bg-brand-charcoal shadow-sm' : ''}`}><ViewColumnsIcon className="h-5 w-5"/></button>
-            <button onClick={() => setViewMode('list')} className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${viewMode === 'list' ? 'bg-white dark:bg-brand-charcoal shadow-sm' : ''}`}><TableCellsIcon className="h-5 w-5"/></button>
+        <div className="flex items-center gap-1 p-1.5 glass-panel rounded-2xl ml-4 bg-white/5">
+            <button 
+                onClick={() => setViewMode('board')} 
+                className={`p-2.5 rounded-xl transition-luxury group ${viewMode === 'board' ? 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20' : 'text-zinc-500 hover:text-white'}`}
+            >
+                <ViewColumnsIcon className="h-4 w-4"/>
+            </button>
+            <button 
+                onClick={() => setViewMode('list')} 
+                className={`p-2.5 rounded-xl transition-luxury group ${viewMode === 'list' ? 'bg-brand-gold text-white shadow-lg shadow-brand-gold/20' : 'text-zinc-500 hover:text-white'}`}
+            >
+                <TableCellsIcon className="h-4 w-4"/>
+            </button>
         </div>
     );
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <p className="mt-1 text-gray-600 dark:text-gray-400">Manage and track customer orders.</p>
+        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            {/* Control Bar */}
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div className="flex-1 w-full lg:max-w-2xl flex flex-col sm:flex-row gap-4">
+                    <div className="relative group flex-1">
+                        <div className="flex items-center glass-panel rounded-2xl px-4 py-2 group-focus-within:ring-2 ring-brand-gold/30 transition-luxury bg-white/5">
+                            <NoSymbolIcon className="h-4 w-4 text-zinc-500 group-focus-within:text-brand-gold transition-colors rotate-90"/>
+                            <input 
+                                type="text" 
+                                placeholder="Locate specific order protocol..." 
+                                value={searchTerm}
+                                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                                className="ml-3 bg-transparent border-none text-sm text-white placeholder-zinc-400 focus:outline-none w-full"
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center gap-4">
-                    <input
-                        type="text"
-                        placeholder="Search by Order ID or Customer..."
-                        value={searchTerm}
-                        onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                        className="w-full sm:max-w-xs p-2 border border-gray-300 rounded-md dark:bg-brand-surface dark:border-brand-border dark:text-white"
-                    />
+                
+                <div className="flex items-center">
                     {viewMode === 'list' && (
-                        <select
-                            value={statusFilter}
-                            onChange={e => { setStatusFilter(e.target.value as any); setCurrentPage(1); }}
-                            className="w-full sm:w-auto p-2 border border-gray-300 rounded-md dark:bg-brand-surface dark:border-brand-border dark:text-white"
-                        >
-                            <option value="all">All Statuses</option>
-                            <option value="Confirmed">Confirmed</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Packing">Packing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Out for Delivery">Out for Delivery</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
-                            <option value="Refunded">Refunded</option>
-                        </select>
+                        <div className="glass-panel px-4 py-2 rounded-2xl bg-white/5 border border-white/5">
+                            <select
+                                value={statusFilter}
+                                onChange={e => { setStatusFilter(e.target.value as any); setCurrentPage(1); }}
+                                className="bg-transparent text-xs font-bold text-zinc-300 uppercase tracking-widest focus:outline-none cursor-pointer"
+                            >
+                                <option value="all">Comprehensive Status</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Packing">Packing</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Out for Delivery">Out for Delivery</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Refunded">Refunded</option>
+                            </select>
+                        </div>
                     )}
                     <ViewSwitcher />
                 </div>
             </div>
 
             {viewMode === 'board' ? (
-                <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-full overflow-x-auto">
-                        {boardColumns.map(({ id, title }) => (
-                            <div key={id} className="bg-gray-100 dark:bg-brand-surface rounded-lg min-w-[280px]" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, id)}>
-                                <h2 className="font-semibold p-4 border-b dark:border-brand-border flex justify-between items-center">
-                                    {title} 
-                                    <span className="text-xs font-normal text-gray-500 bg-white dark:bg-brand-charcoal px-2 py-1 rounded-full">{ordersByColumn[id].length}</span>
-                                </h2>
-                                <div className="p-4 space-y-4 h-[65vh] overflow-y-auto custom-scrollbar">
+                <div className="space-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 h-full overflow-x-auto pb-10 custom-scrollbar">
+                        {boardColumns.map(({ id, title, subtitle }) => (
+                            <div key={id} className="min-w-[320px] flex flex-col group" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, id)}>
+                                <div className="mb-6 px-4">
+                                    <h2 className="font-serif text-xl font-bold text-white tracking-wide flex items-center justify-between">
+                                        {title} 
+                                        <span className="text-[10px] font-black text-brand-gold bg-brand-gold/10 px-3 py-1 rounded-full border border-brand-gold/20">{ordersByColumn[id].length}</span>
+                                    </h2>
+                                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-1">{subtitle}</p>
+                                </div>
+                                <div className="flex-1 p-3 glass-panel rounded-[2rem] bg-white/[0.02] border-white/5 min-h-[500px] max-h-[70vh] overflow-y-auto custom-scrollbar group-hover:border-brand-gold/20 transition-luxury">
                                     {ordersByColumn[id].map(order => (
                                         <OrderCard key={order.id} order={order} onDragStart={handleDragStart} onClick={() => setOrderToView(order)} />
                                     ))}
+                                    {ordersByColumn[id].length === 0 && (
+                                        <div className="h-full flex flex-col items-center justify-center p-12 text-center opacity-20">
+                                            <div className="w-12 h-12 rounded-full border border-dashed border-zinc-500 mb-4"></div>
+                                            <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">Neutral State</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className="mt-4">
-                        <label className="flex items-center space-x-2 cursor-pointer">
-                            <input type="checkbox" checked={showCancelled} onChange={() => setShowCancelled(!showCancelled)} className="h-4 w-4 rounded text-brand-gold focus:ring-brand-gold"/>
-                            <span className="text-sm">Show Inactive Orders (Cancelled/Refunded)</span>
-                        </label>
+                    
+                    {/* Inactive Orders Section */}
+                    <div className="glass-card rounded-[2.5rem] p-10 relative overflow-hidden">
+                         <div className="absolute top-0 left-0 w-full h-1 bg-rose-500/30"></div>
+                         <div className="flex justify-between items-center mb-8">
+                            <div>
+                                <h2 className="text-2xl font-serif font-bold text-white tracking-wide">Archived Protocols</h2>
+                                <p className="text-[10px] font-bold text-rose-500 uppercase tracking-widest mt-1">Terminated and Void Transactions</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer group">
+                                <input type="checkbox" checked={showCancelled} onChange={() => setShowCancelled(!showCancelled)} className="sr-only peer" />
+                                <div className="w-12 h-6 bg-white/5 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-zinc-600 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500/20 peer-checked:after:bg-rose-500"></div>
+                                <span className="ml-3 text-[10px] font-bold text-zinc-400 uppercase tracking-widest group-hover:text-white transition-colors">Toggle Visibility</span>
+                            </label>
+                         </div>
+                         
                         {showCancelled && (
-                            <div className="mt-4 bg-red-50 dark:bg-red-900/10 p-4 rounded-lg border border-red-200 dark:border-red-900/30">
-                                <h2 className="font-semibold text-red-800 dark:text-red-300 flex items-center mb-4"><NoSymbolIcon className="h-5 w-5 mr-2"/>Inactive Orders</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in zoom-in-95 duration-500">
                                 {inactiveOrders.length > 0 ? inactiveOrders.map(order => (
-                                     <div key={order.id} onClick={() => setOrderToView(order)} className="bg-white dark:bg-brand-surface p-3 rounded-md shadow-sm border dark:border-brand-border mb-3 cursor-pointer flex justify-between items-center">
-                                        <div>
-                                            <p className="font-mono text-sm font-medium">{order.id}</p>
-                                            <p className="text-xs text-gray-500">{order.customerName}</p>
+                                     <div key={order.id} onClick={() => setOrderToView(order)} className="glass-panel p-5 rounded-2xl border-l-2 border-rose-500/40 hover:bg-white/5 cursor-pointer transition-luxury">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <p className="font-black text-[10px] text-zinc-500 tracking-widest uppercase">{order.id}</p>
+                                            <StatusBadge status={order.status} />
                                         </div>
-                                        <StatusBadge status={order.status} />
+                                        <p className="text-sm font-bold text-zinc-400 truncate">{order.customerName}</p>
                                      </div>
-                                )) : <p className="text-sm text-gray-500">No inactive orders.</p>}
+                                )) : <p className="text-sm text-zinc-600 italic font-serif p-10 text-center col-span-full">No archived logs found.</p>}
                             </div>
                         )}
                     </div>
-                </>
+                </div>
             ) : (
                 <>
-                    <div className="bg-white dark:bg-brand-charcoal rounded-lg shadow-md border border-gray-200 dark:border-brand-border overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-900/50 dark:text-gray-400">
-                                    <tr>
-                                        <th scope="col" className="px-6 py-3">Order ID</th>
-                                        <th scope="col" className="px-6 py-3">Date</th>
-                                        <th scope="col" className="px-6 py-3">Customer</th>
-                                        <th scope="col" className="px-6 py-3">Total</th>
-                                        <th scope="col" className="px-6 py-3">Status</th>
-                                        <th scope="col" className="px-6 py-3 text-right">Actions</th>
+                    <div className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl relative border border-white/5">
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl -z-10"></div>
+                        <div className="overflow-x-auto custom-scrollbar">
+                            <table className="w-full text-left">
+                                 <thead>
+                                    <tr className="glass-panel text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                                        <th className="px-8 py-6">Protocol ID</th>
+                                        <th className="px-6 py-6">Acquisition Date</th>
+                                        <th className="px-6 py-6">Client Identity</th>
+                                        <th className="px-6 py-6">Total Value</th>
+                                        <th className="px-6 py-6">Logistics Status</th>
+                                        <th className="px-8 py-6 text-right">Analysis</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-white/5">
                                     {paginatedOrders.map(order => (
-                                        <tr key={order.id} className="bg-white dark:bg-brand-charcoal border-b dark:border-brand-border hover:bg-gray-50 dark:hover:bg-gray-600/20">
-                                            <td className="px-6 py-4 font-mono font-medium text-gray-900 dark:text-white">{order.id}</td>
-                                            <td className="px-6 py-4">{new Date(order.date).toLocaleDateString()}</td>
-                                            <td className="px-6 py-4">{order.customerName}</td>
-                                            <td className="px-6 py-4 font-semibold">Rs. {order.total.toLocaleString()}</td>
-                                            <td className="px-6 py-4"><StatusBadge status={order.status} /></td>
-                                            <td className="px-6 py-4 text-right">
-                                                <button onClick={() => setOrderToView(order)} className="font-medium text-brand-gold hover:underline">
-                                                    View Details
+                                        <tr key={order.id} className="group hover:bg-white/5 transition-luxury">
+                                            <td className="px-8 py-6">
+                                                <span className="font-serif font-black text-brand-gold tracking-widest text-xs uppercase">{order.id}</span>
+                                            </td>
+                                            <td className="px-6 py-6 text-sm text-zinc-400 font-medium">
+                                                {new Date(order.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                                            </td>
+                                            <td className="px-6 py-6 text-sm font-bold text-white group-hover:text-brand-gold transition-luxury">
+                                                {order.customerName}
+                                            </td>
+                                            <td className="px-6 py-6">
+                                                <span className="text-sm font-black text-white">Rs. {order.total.toLocaleString()}</span>
+                                            </td>
+                                            <td className="px-6 py-6"><StatusBadge status={order.status} /></td>
+                                            <td className="px-8 py-6 text-right">
+                                                <button onClick={() => setOrderToView(order)} className="px-6 py-2.5 glass-panel rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-brand-gold hover:bg-brand-gold/10 hover:border-brand-gold/30 transition-luxury">
+                                                    Full Audit
                                                 </button>
                                             </td>
                                         </tr>
@@ -281,22 +333,25 @@ export const AdminOrders: React.FC<AdminOrdersProps> = ({ orders, setOrders, add
                             </table>
                         </div>
                     </div>
+                    
                     {totalPages > 1 && (
-                        <div className="mt-6 flex justify-between items-center">
+                        <div className="flex justify-center items-center gap-6 mt-12">
                             <button
                                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                 disabled={currentPage === 1}
-                                className="flex items-center px-4 py-2 text-sm font-medium border rounded-md disabled:opacity-50"
+                                className="p-4 glass-panel rounded-2xl text-gray-500 hover:text-brand-gold disabled:opacity-20 transition-luxury"
                             >
-                                <ChevronLeftIcon className="h-4 w-4 mr-1"/> Previous
+                                <ChevronLeftIcon className="h-5 w-5"/>
                             </button>
-                            <span className="text-sm">Page {currentPage} of {totalPages}</span>
+                            <div className="px-8 py-3 glass-panel rounded-2xl bg-white/5">
+                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-300">Section {currentPage} <span className="text-zinc-600 mx-2">/</span> {totalPages}</span>
+                            </div>
                             <button
                                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                 disabled={currentPage === totalPages}
-                                className="flex items-center px-4 py-2 text-sm font-medium border rounded-md disabled:opacity-50"
+                                className="p-4 glass-panel rounded-2xl text-gray-500 hover:text-brand-gold disabled:opacity-20 transition-luxury"
                             >
-                                Next <ChevronRightIcon className="h-4 w-4 ml-1"/>
+                                <ChevronRightIcon className="h-5 w-5"/>
                             </button>
                         </div>
                     )}

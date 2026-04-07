@@ -1,5 +1,3 @@
-
-
 export interface ProductVariant {
   size: string;
   color: string;
@@ -12,7 +10,7 @@ export interface Product {
   price: number;
   discountPrice?: number;
   description: string;
-  category: 'men' | 'women' | 'unisex' | 'sportswear';
+  category: "men" | "women" | "unisex" | "sportswear";
   subCategory: string;
   imageUrls: string[];
   sizes: string[];
@@ -38,29 +36,58 @@ export interface UserAddress {
   country: string;
 }
 
-export type OrderStatus = 'Confirmed' | 'Processing' | 'Packing' | 'Shipped' | 'Out for Delivery' | 'Delivered' | 'Cancelled' | 'Refunded';
+export type OrderStatus =
+  | "Confirmed"
+  | "Processing"
+  | "Packing"
+  | "Shipped"
+  | "Out for Delivery"
+  | "Delivered"
+  | "Cancelled"
+  | "Refunded";
 
 export interface UserOrder {
-    id: string;
-    date: string;
-    status: OrderStatus;
-    total: number;
+  id: string;
+  date: string;
+  status: OrderStatus;
+  total: number;
 }
 
 export interface User {
-    id: string;
-    email: string;
-    name: string;
-    password?: string;
-    role?: 'admin' | 'user';
-    status?: 'Active' | 'Inactive';
-    createdAt?: string;
-    lastSeen?: string;
-    address?: UserAddress;
-    orders?: UserOrder[];
+  id: string;
+  email: string;
+  name: string;
+  password?: string;
+  role?: "admin" | "user";
+  status?: "Active" | "Inactive";
+  createdAt?: string;
+  lastSeen?: string;
+  address?: UserAddress;
+  orders?: UserOrder[];
+  token?: string;
 }
 
-export type Page = 'home' | 'shop' | 'product' | 'cart' | 'checkout' | 'login' | 'register' | 'forgotPassword' | 'about' | 'careers' | 'press' | 'contact' | 'faq' | 'shipping' | 'privacy' | 'terms' | 'admin' | 'orderTracking';
+export type Page =
+  | "home"
+  | "shop"
+  | "product"
+  | "cart"
+  | "checkout"
+  | "orderSuccess"
+  | "login"
+  | "register"
+  | "forgotPassword"
+  | "about"
+  | "careers"
+  | "press"
+  | "contact"
+  | "faq"
+  | "shipping"
+  | "privacy"
+  | "terms"
+  | "dashboard"
+  | "admin"
+  | "orderTracking";
 
 // Types for Admin Panel Content Management
 export interface HeroSlide {
@@ -95,48 +122,47 @@ export interface AboutPageContent {
 }
 
 export interface JobOpening {
-    id: string;
-    title: string;
-    location: string;
-    department: string;
+  id: string;
+  title: string;
+  location: string;
+  department: string;
 }
 export type CareersPageContent = JobOpening[];
 
 export interface PressFeature {
-    id: string;
-    publication: string;
-    title: string;
-    date: string;
-    link: string;
+  id: string;
+  publication: string;
+  title: string;
+  date: string;
+  link: string;
 }
 export type PressPageContent = PressFeature[];
 
 export interface FAQItem {
-    id: string;
-    question: string;
-    answer: string;
+  id: string;
+  question: string;
+  answer: string;
 }
 export type FAQPageContent = FAQItem[];
 
 export interface PolicySectionContent {
-    id: string;
-    title: string;
-    content: string;
+  id: string;
+  title: string;
+  content: string;
 }
 export interface PrivacyPolicyPageContent {
-    sections: PolicySectionContent[];
+  sections: PolicySectionContent[];
 }
 export interface TermsOfServicePageContent {
-    sections: PolicySectionContent[];
+  sections: PolicySectionContent[];
 }
-
 
 // Store Settings
 export interface StoreSettings {
   storeName: string;
   contactEmail: string;
   address: string;
-  currency: 'LKR' | 'USD' | 'EUR';
+  currency: "LKR" | "USD" | "EUR";
   socialLinks: {
     instagram: string;
     facebook: string;
@@ -154,9 +180,9 @@ export interface StoreSettings {
 }
 
 export interface OrderStatusHistory {
-    status: OrderStatus;
-    timestamp: string;
-    note?: string;
+  status: OrderStatus;
+  timestamp: string;
+  note?: string;
 }
 
 export interface Order {
@@ -176,19 +202,19 @@ export interface Order {
   tax?: number;
   total: number;
   trackingNumber?: string;
-  trackingCarrier?: 'UPS' | 'FedEx' | 'DHL' | 'Other';
+  trackingCarrier?: "UPS" | "FedEx" | "DHL" | "Other";
 }
 
 export interface DiscountCode {
-    id: number;
-    code: string;
-    type: 'percentage' | 'fixed' | 'free_shipping';
-    value: number;
-    isActive: boolean;
-    minimumPurchase?: number;
-    usageLimit?: number;
-    uses?: number;
-    expiresAt?: string;
+  id: number;
+  code: string;
+  type: "percentage" | "fixed" | "free_shipping";
+  value: number;
+  isActive: boolean;
+  minimumPurchase?: number;
+  usageLimit?: number;
+  uses?: number;
+  expiresAt?: string;
 }
 
 export interface ProductAttributes {
@@ -199,53 +225,64 @@ export interface ProductAttributes {
 }
 
 export interface ContactMessage {
-    id?: string;
-    name: string;
-    email: string;
-    subject: string;
-    message: string;
-    createdAt?: string;
+  id?: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt?: string;
 }
 
-
 // Types for Admin Panel Navigation
-export type AdminSection = 'dashboard' | 'products' | 'orders' | 'customers' | 'discounts' | 'attributes' | 'navigation' | 'userManagement' | 'content' | 'homepageSettings' | 'settings' | 'analytics';
+export type AdminSection =
+  | "dashboard"
+  | "products"
+  | "orders"
+  | "customers"
+  | "discounts"
+  | "attributes"
+  | "navigation"
+  | "userManagement"
+  | "content"
+  | "homepageSettings"
+  | "settings"
+  | "analytics";
 
 // Types for site navigation
 export interface NavLinkFilter {
-    category?: string;
-    subCategory?: string;
+  category?: string;
+  subCategory?: string;
 }
 
 export interface NavLinkChild {
-    id: string;
-    name: string;
-    filters: NavLinkFilter;
+  id: string;
+  name: string;
+  filters: NavLinkFilter;
 }
 
 export interface NavLinkFeaturedLink {
-    page: Page;
-    filters: NavLinkFilter;
+  page: Page;
+  filters: NavLinkFilter;
 }
 
 export interface NavLink {
-    id: string;
-    name: string;
-    page: Page;
-    filters?: NavLinkFilter;
-    isMega?: boolean;
-    featuredImage?: string;
-    featuredTitle?: string;
-    featuredLink?: NavLinkFeaturedLink;
-    children?: NavLinkChild[];
+  id: string;
+  name: string;
+  page: Page;
+  filters?: NavLinkFilter;
+  isMega?: boolean;
+  featuredImage?: string;
+  featuredTitle?: string;
+  featuredLink?: NavLinkFeaturedLink;
+  children?: NavLinkChild[];
 }
 
 // Types for Admin Panel Notification Center
 export interface Notification {
-    id: string;
-    type: 'order' | 'stock' | 'customer';
-    message: string;
-    isRead: boolean;
-    timestamp: string;
-    link: { section: AdminSection };
+  id: string;
+  type: "order" | "stock" | "customer";
+  message: string;
+  isRead: boolean;
+  timestamp: string;
+  link: { section: AdminSection };
 }

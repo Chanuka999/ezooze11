@@ -1,27 +1,26 @@
-
-import { Product, Order, User, ContactMessage } from '../types';
+import { Product, Order, User, ContactMessage } from "../types";
 
 // Use environment variable for API URL, fallback to localhost for development
-let API_URL = 'http://localhost:5000/api';
+let API_URL = "http://localhost:5000/api";
 let authToken: string | null = null;
 
 try {
-    const meta = (import.meta as any) || {};
-    const env = meta.env || {};
-    if (env.VITE_API_URL) {
-        API_URL = env.VITE_API_URL;
-    }
+  const meta = (import.meta as any) || {};
+  const env = meta.env || {};
+  if (env.VITE_API_URL) {
+    API_URL = env.VITE_API_URL;
+  }
 } catch (e) {
-    // Keep default localhost URL if env access fails
+  // Keep default localhost URL if env access fails
 }
 
 // Helper function to create headers with auth token
-const getHeaders = (contentType = 'application/json') => {
+const getHeaders = (contentType = "application/json") => {
   const headers: HeadersInit = {
-    'Content-Type': contentType,
+    "Content-Type": contentType,
   };
   if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
+    headers["Authorization"] = `Bearer ${authToken}`;
   }
   return headers;
 };
@@ -29,14 +28,15 @@ const getHeaders = (contentType = 'application/json') => {
 // Helper function to handle API responses with better error messages
 const handleResponse = async (response: Response) => {
   const data = await response.json().catch(() => ({}));
-  
+
   if (!response.ok) {
-    const errorMessage = data.message || data.error || `HTTP ${response.status}`;
+    const errorMessage =
+      data.message || data.error || `HTTP ${response.status}`;
     const error = new Error(errorMessage) as any;
     error.response = { status: response.status, data };
     throw error;
   }
-  
+
   return data;
 };
 
@@ -57,10 +57,41 @@ export const dbClient = {
     return handleResponse(response);
   },
 
+  async createProduct(
+    productData: Omit<Product, "id" | "createdAt">,
+  ): Promise<Product> {
+    const response = await fetch(`${API_URL}/products`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify(productData),
+    });
+    return handleResponse(response);
+  },
+
+  async updateProduct(
+    id: string | number,
+    productData: Partial<Product>,
+  ): Promise<Product> {
+    const response = await fetch(`${API_URL}/products/${id}`, {
+      method: "PUT",
+      headers: getHeaders(),
+      body: JSON.stringify(productData),
+    });
+    return handleResponse(response);
+  },
+
+  async deleteProduct(id: string | number): Promise<{ message: string }> {
+    const response = await fetch(`${API_URL}/products/${id}`, {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
+    return handleResponse(response);
+  },
+
   // Orders
   async createOrder(orderData: any): Promise<Order> {
     const response = await fetch(`${API_URL}/orders`, {
-      method: 'POST',
+      method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(orderData),
     });
@@ -68,9 +99,12 @@ export const dbClient = {
   },
 
   async getMyOrders(userId: string): Promise<Order[]> {
-    const response = await fetch(`${API_URL}/orders/myorders?userId=${userId}`, {
-      headers: getHeaders(),
-    });
+    const response = await fetch(
+      `${API_URL}/orders/myorders?userId=${userId}`,
+      {
+        headers: getHeaders(),
+      },
+    );
     return handleResponse(response);
   },
 
@@ -84,40 +118,51 @@ export const dbClient = {
   // Users
   async login(email: string, password: string): Promise<User> {
     const response = await fetch(`${API_URL}/users/login`, {
-      method: 'POST',
+      method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ email, password }),
     });
     return handleResponse(response);
   },
-  
+
   async register(name: string, email: string, pass: string): Promise<User> {
     const response = await fetch(`${API_URL}/users/register`, {
-      method: 'POST',
+      method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ name, email, password: pass }),
     });
     return handleResponse(response);
   },
 
-  async signInWithGoogle(idToken: string, profile?: { email?: string; name?: string; picture?: string; googleId?: string }): Promise<User> {
+  async signInWithGoogle(
+    idToken: string,
+    profile?: {
+      email?: string;
+      name?: string;
+      picture?: string;
+      googleId?: string;
+    },
+  ): Promise<User> {
     const response = await fetch(`${API_URL}/users/oauth/google`, {
-      method: 'POST',
+      method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ idToken, ...profile }),
     });
     return handleResponse(response);
   },
 
-  async signInWithApple(idToken: string, profile?: { email?: string; name?: string; appleId?: string }): Promise<User> {
+  async signInWithApple(
+    idToken: string,
+    profile?: { email?: string; name?: string; appleId?: string },
+  ): Promise<User> {
     const response = await fetch(`${API_URL}/users/oauth/apple`, {
-      method: 'POST',
+      method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ idToken, ...profile }),
     });
     return handleResponse(response);
   },
-  
+
   async getUsers(): Promise<User[]> {
     const response = await fetch(`${API_URL}/users`, {
       headers: getHeaders(),
@@ -127,16 +172,21 @@ export const dbClient = {
 
   async updateUser(userId: string, updates: Partial<User>): Promise<User> {
     const response = await fetch(`${API_URL}/users/${userId}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify(updates),
     });
     return handleResponse(response);
   },
 
-  async changePassword(userId: string, currentPassword: string, newPassword: string, confirmPassword: string): Promise<any> {
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword: string,
+  ): Promise<any> {
     const response = await fetch(`${API_URL}/users/${userId}/change-password`, {
-      method: 'PUT',
+      method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
     });
@@ -146,7 +196,7 @@ export const dbClient = {
   // Contact
   async submitContactForm(data: ContactMessage): Promise<ContactMessage> {
     const response = await fetch(`${API_URL}/contact`, {
-      method: 'POST',
+      method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(data),
     });
@@ -154,12 +204,18 @@ export const dbClient = {
   },
 
   // Payments
-  async createPaymentIntent(amount: number, currency: string): Promise<{ clientSecret: string }> {
+  async createPaymentIntent(
+    amount: number,
+    currency: string,
+  ): Promise<{ clientSecret: string }> {
     const response = await fetch(`${API_URL}/payments/create-intent`, {
-      method: 'POST',
+      method: "POST",
       headers: getHeaders(),
-      body: JSON.stringify({ amount: Math.round(amount * 100), currency: currency.toLowerCase() }),
+      body: JSON.stringify({
+        amount: Math.round(amount * 100),
+        currency: currency.toLowerCase(),
+      }),
     });
     return handleResponse(response);
-  }
+  },
 };

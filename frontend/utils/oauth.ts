@@ -21,7 +21,7 @@ const loadScriptOnce = (id: string, src: string): Promise<void> => {
       return;
     }
 
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.id = id;
     script.src = src;
     script.async = true;
@@ -31,13 +31,18 @@ const loadScriptOnce = (id: string, src: string): Promise<void> => {
   });
 };
 
-export const getGoogleIdToken = async (clientId: string): Promise<{ idToken: string }> => {
-  await loadScriptOnce('google-identity', 'https://accounts.google.com/gsi/client');
+export const getGoogleIdToken = async (
+  clientId: string,
+): Promise<{ idToken: string }> => {
+  await loadScriptOnce(
+    "google-identity",
+    "https://accounts.google.com/gsi/client",
+  );
 
   return new Promise((resolve, reject) => {
     const google = window.google;
     if (!google?.accounts?.id) {
-      reject(new Error('Google Identity Services are unavailable'));
+      reject(new Error("Google Identity Services are unavailable"));
       return;
     }
 
@@ -51,7 +56,7 @@ export const getGoogleIdToken = async (clientId: string): Promise<{ idToken: str
         if (response?.credential) {
           resolve({ idToken: response.credential });
         } else {
-          reject(new Error('Google did not return a credential'));
+          reject(new Error("Google did not return a credential"));
         }
       },
       auto_select: false,
@@ -60,36 +65,54 @@ export const getGoogleIdToken = async (clientId: string): Promise<{ idToken: str
 
     google.accounts.id.prompt((notification: any) => {
       if (settled) return;
-      const reason = notification?.getNotDisplayedReason?.() || notification?.getSkippedReason?.();
-      if (reason) {
-        settled = true;
-        reject(new Error(`Google Sign-In was not completed: ${reason}`));
+
+      const isNotDisplayed = notification?.isNotDisplayed?.();
+      const isSkipped = notification?.isSkippedMoment?.();
+
+      if (isNotDisplayed) {
+        const reason = notification?.getNotDisplayedReason?.();
+        // Some browsers/FedCM report unknown_reason for non-terminal states.
+        if (reason && reason !== "unknown_reason") {
+          settled = true;
+          reject(new Error(`Google Sign-In was not completed: ${reason}`));
+        }
+      }
+
+      if (isSkipped) {
+        const reason = notification?.getSkippedReason?.();
+        if (reason && reason !== "unknown_reason") {
+          settled = true;
+          reject(new Error(`Google Sign-In was not completed: ${reason}`));
+        }
       }
     });
 
     setTimeout(() => {
       if (!settled) {
         settled = true;
-        reject(new Error('Google Sign-In timed out'));
+        reject(new Error("Google Sign-In timed out"));
       }
-    }, 15000);
+    }, 30000);
   });
 };
 
 export const getAppleIdToken = async (
   clientId: string,
-  redirectUri: string
+  redirectUri: string,
 ): Promise<{ idToken: string; email?: string; name?: string }> => {
-  await loadScriptOnce('apple-signin', 'https://appleid.apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js');
+  await loadScriptOnce(
+    "apple-signin",
+    "https://appleid.apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js",
+  );
 
   const AppleID = window.AppleID;
   if (!AppleID?.auth) {
-    throw new Error('Apple Sign-In SDK is unavailable');
+    throw new Error("Apple Sign-In SDK is unavailable");
   }
 
   AppleID.auth.init({
     clientId,
-    scope: 'name email',
+    scope: "name email",
     redirectURI: redirectUri,
     usePopup: true,
   });
@@ -98,11 +121,12 @@ export const getAppleIdToken = async (
   const idToken = response?.authorization?.id_token;
   const email = response?.user?.email;
   const name = response?.user?.name
-    ? `${response.user.name.firstName || ''} ${response.user.name.lastName || ''}`.trim() || undefined
+    ? `${response.user.name.firstName || ""} ${response.user.name.lastName || ""}`.trim() ||
+      undefined
     : undefined;
 
   if (!idToken) {
-    throw new Error('Apple did not return an identity token');
+    throw new Error("Apple did not return an identity token");
   }
 
   return { idToken, email, name };
